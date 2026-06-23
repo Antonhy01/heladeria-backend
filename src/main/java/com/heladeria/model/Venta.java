@@ -1,6 +1,10 @@
 package com.heladeria.model;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,22 +15,29 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate fecha;
 
+    @Column(nullable = false)
     private Double total;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<DetalleVenta> detalles;
 
     public Venta() {
     }
 
-    public Venta(Long id, LocalDate fecha, Double total, Cliente cliente) {
+    public Venta(Long id, LocalDate fecha, Double total, Cliente cliente, List<DetalleVenta> detalles) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
         this.cliente = cliente;
+        this.detalles = detalles;
     }
 
     public Long getId() {
@@ -59,5 +70,13 @@ public class Venta {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
     }
 }

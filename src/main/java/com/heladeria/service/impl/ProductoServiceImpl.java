@@ -1,5 +1,7 @@
 package com.heladeria.service.impl;
 
+import com.heladeria.model.Categoria;
+import com.heladeria.repository.CategoriaRepository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;

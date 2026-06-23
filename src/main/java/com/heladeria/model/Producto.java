@@ -10,24 +10,27 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nombre;
 
+    @Column(nullable = false)
     private String sabor;
 
+    @Column(nullable = false)
     private Double precio;
 
+    @Column(nullable = false)
     private Integer stock;
 
-    @ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     public Producto() {
     }
 
-    public Producto(Long id, String nombre, String sabor,
-                    Double precio, Integer stock,
-                    Categoria categoria) {
+    public Producto(Long id, String nombre, String sabor, Double precio,
+                     Integer stock, Categoria categoria) {
         this.id = id;
         this.nombre = nombre;
         this.sabor = sabor;
