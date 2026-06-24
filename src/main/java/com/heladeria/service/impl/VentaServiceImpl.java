@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.heladeria.model.Cliente;
 import com.heladeria.model.Venta;
+import com.heladeria.repository.ClienteRepository;
 import com.heladeria.repository.VentaRepository;
 import com.heladeria.service.VentaService;
 
@@ -14,6 +16,9 @@ public class VentaServiceImpl implements VentaService {
 
     @Autowired
     private VentaRepository repository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     @Override
     public List<Venta> listar() {
@@ -27,6 +32,20 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     public Venta guardar(Venta venta) {
+
+        if (venta.getCliente() == null ||
+            venta.getCliente().getId() == null) {
+
+            throw new RuntimeException("Debe seleccionar un cliente.");
+        }
+
+        Cliente cliente = clienteRepository
+                .findById(venta.getCliente().getId())
+                .orElseThrow(() ->
+                        new RuntimeException("El cliente no existe."));
+
+        venta.setCliente(cliente);
+
         return repository.save(venta);
     }
 
@@ -37,9 +56,14 @@ public class VentaServiceImpl implements VentaService {
 
         if (existente != null) {
 
+            Cliente cliente = clienteRepository
+                    .findById(venta.getCliente().getId())
+                    .orElseThrow(() ->
+                            new RuntimeException("El cliente no existe."));
+
             existente.setFecha(venta.getFecha());
             existente.setTotal(venta.getTotal());
-            existente.setCliente(venta.getCliente());
+            existente.setCliente(cliente);
 
             return repository.save(existente);
         }

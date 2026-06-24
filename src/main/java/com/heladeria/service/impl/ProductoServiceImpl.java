@@ -1,13 +1,13 @@
 package com.heladeria.service.impl;
 
-import com.heladeria.model.Categoria;
-import com.heladeria.repository.CategoriaRepository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.heladeria.model.Categoria;
 import com.heladeria.model.Producto;
+import com.heladeria.repository.CategoriaRepository;
 import com.heladeria.repository.ProductoRepository;
 import com.heladeria.service.ProductoService;
 
@@ -16,6 +16,9 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
     private ProductoRepository repository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @Override
     public List<Producto> listar() {
@@ -29,6 +32,20 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public Producto guardar(Producto producto) {
+
+        if (producto.getCategoria() == null ||
+            producto.getCategoria().getId() == null) {
+
+            throw new RuntimeException("Debe seleccionar una categoría.");
+        }
+
+        Categoria categoria = categoriaRepository
+                .findById(producto.getCategoria().getId())
+                .orElseThrow(() ->
+                        new RuntimeException("La categoría no existe."));
+
+        producto.setCategoria(categoria);
+
         return repository.save(producto);
     }
 
@@ -39,11 +56,16 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (existente != null) {
 
+            Categoria categoria = categoriaRepository
+                    .findById(producto.getCategoria().getId())
+                    .orElseThrow(() ->
+                            new RuntimeException("La categoría no existe."));
+
             existente.setNombre(producto.getNombre());
             existente.setSabor(producto.getSabor());
             existente.setPrecio(producto.getPrecio());
             existente.setStock(producto.getStock());
-            existente.setCategoria(producto.getCategoria());
+            existente.setCategoria(categoria);
 
             return repository.save(existente);
         }
