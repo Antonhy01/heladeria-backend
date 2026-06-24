@@ -10,25 +10,28 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Integer cantidad;
 
+    @Column(nullable = false)
     private Double precioUnitario;
 
+    @Column(nullable = false)
     private Double subtotal;
 
-    @ManyToOne
-    @JoinColumn(name = "venta_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
     public DetalleVenta() {
     }
 
     public DetalleVenta(Long id, Integer cantidad, Double precioUnitario,
-                        Double subtotal, Venta venta, Producto producto) {
+            Double subtotal, Venta venta, Producto producto) {
         this.id = id;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
