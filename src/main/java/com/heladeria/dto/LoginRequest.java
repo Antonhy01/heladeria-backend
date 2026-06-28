@@ -3,7 +3,6 @@ package com.heladeria.dto;
 public class LoginRequest {
 
     private String usuario;
-
     private String password;
 
     public LoginRequest() {
