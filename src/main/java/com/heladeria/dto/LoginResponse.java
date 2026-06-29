@@ -2,6 +2,7 @@ package com.heladeria.dto;
 
 public class LoginResponse {
 
+    private String token;
     private Long id;
     private String nombre;
     private String usuario;
@@ -11,17 +12,27 @@ public class LoginResponse {
     public LoginResponse() {
     }
 
-    public LoginResponse(Long id,
+    public LoginResponse(String token,
+                         Long id,
                          String nombre,
                          String usuario,
                          String rol,
                          String mensaje) {
 
+        this.token = token;
         this.id = id;
         this.nombre = nombre;
         this.usuario = usuario;
         this.rol = rol;
         this.mensaje = mensaje;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Long getId() {
