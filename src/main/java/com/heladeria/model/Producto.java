@@ -1,5 +1,11 @@
 package com.heladeria.model;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -13,38 +19,39 @@ public class Producto {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
-    private String sabor;
+    private String descripcion;
 
     @Column(nullable = false)
-    private Double precio;
+    private BigDecimal precio;
 
     @Column(nullable = false)
     private Integer stock;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "producto")
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
     public Producto() {
     }
 
-    public Producto(Long id, String nombre, String sabor, Double precio,
-                     Integer stock, Categoria categoria) {
+    public Producto(Long id, String nombre, String descripcion, BigDecimal precio,
+            Integer stock, Categoria categoria, List<DetalleVenta> detalles) {
+
         this.id = id;
         this.nombre = nombre;
-        this.sabor = sabor;
+        this.descripcion = descripcion;
         this.precio = precio;
         this.stock = stock;
         this.categoria = categoria;
+        this.detalles = detalles;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNombre() {
@@ -55,19 +62,23 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public String getSabor() {
-        return sabor;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setSabor(String sabor) {
-        this.sabor = sabor;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public Double getPrecio() {
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public BigDecimal getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Double precio) {
+    public void setPrecio(BigDecimal precio) {
         this.precio = precio;
     }
 
@@ -86,4 +97,13 @@ public class Producto {
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
+
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
+    }
+
 }

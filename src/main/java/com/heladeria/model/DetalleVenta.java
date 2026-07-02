@@ -1,5 +1,7 @@
 package com.heladeria.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,81 +12,96 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private Integer cantidad;
 
-    @Column(nullable = false)
-    private Double precioUnitario;
+    private BigDecimal precio;
 
-    @Column(nullable = false)
-    private Double subtotal;
+    private BigDecimal subtotal;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "venta_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "venta_id")
     private Venta venta;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "producto_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
     private Producto producto;
 
     public DetalleVenta() {
     }
 
-    public DetalleVenta(Long id, Integer cantidad, Double precioUnitario,
-            Double subtotal, Venta venta, Producto producto) {
+    public DetalleVenta(Long id,
+                        Integer cantidad,
+                        BigDecimal precio,
+                        BigDecimal subtotal,
+                        Venta venta,
+                        Producto producto) {
+
         this.id = id;
         this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
+        this.precio = precio;
         this.subtotal = subtotal;
         this.venta = venta;
         this.producto = producto;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void calcularSubtotal() {
+
+        if(precio!=null && cantidad!=null){
+
+            subtotal = precio.multiply(BigDecimal.valueOf(cantidad));
+
+        }
+
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long id){
+        this.id=id;
     }
 
-    public Integer getCantidad() {
+    public Integer getCantidad(){
         return cantidad;
     }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
+    public void setCantidad(Integer cantidad){
+        this.cantidad=cantidad;
     }
 
-    public Double getPrecioUnitario() {
-        return precioUnitario;
+    public BigDecimal getPrecio(){
+        return precio;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
-        this.precioUnitario = precioUnitario;
+    public void setPrecio(BigDecimal precio){
+        this.precio=precio;
     }
 
-    public Double getSubtotal() {
+    public BigDecimal getSubtotal(){
         return subtotal;
     }
 
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
+    public void setSubtotal(BigDecimal subtotal){
+        this.subtotal=subtotal;
     }
 
-    public Venta getVenta() {
+    public Venta getVenta(){
         return venta;
     }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
+    public void setVenta(Venta venta){
+        this.venta=venta;
     }
 
-    public Producto getProducto() {
+    public Producto getProducto(){
         return producto;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+    public void setProducto(Producto producto){
+        this.producto=producto;
     }
+
 }

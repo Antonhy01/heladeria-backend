@@ -2,22 +2,64 @@ package com.heladeria.service;
 
 import java.util.List;
 
-import com.heladeria.dto.LoginRequest;
-import com.heladeria.dto.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.heladeria.model.Usuario;
+import com.heladeria.repository.UsuarioRepository;
 
-public interface UsuarioService {
+@Service
+public class UsuarioService {
 
-    List<Usuario> listar();
+    @Autowired
+    private UsuarioRepository repository;
 
-    Usuario buscarPorId(Long id);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    Usuario guardar(Usuario usuario);
+    public List<Usuario> listar() {
+        return repository.findAll();
+    }
 
-    Usuario actualizar(Long id, Usuario usuario);
+    public Usuario buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-    void eliminar(Long id);
+    public Usuario buscarPorUsername(String username) {
+        return repository.findByUsername(username);
+    }
 
-    LoginResponse login(LoginRequest request);
+    public Usuario guardar(Usuario usuario) {
+
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
+        return repository.save(usuario);
+    }
+
+    public Usuario actualizar(Long id, Usuario usuario) {
+
+        Usuario existente = repository.findById(id).orElse(null);
+
+        if (existente != null) {
+
+            existente.setNombre(usuario.getNombre());
+            existente.setUsername(usuario.getUsername());
+
+            if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+                existente.setPassword(passwordEncoder.encode(usuario.getPassword()));
+            }
+
+            existente.setRol(usuario.getRol());
+
+            return repository.save(existente);
+        }
+
+        return null;
+    }
+
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
 
 }

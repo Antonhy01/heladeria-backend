@@ -1,17 +1,48 @@
 package com.heladeria.service;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.heladeria.model.Categoria;
+import com.heladeria.repository.CategoriaRepository;
 
-public interface CategoriaService {
+@Service
+public class CategoriaService {
 
-    List<Categoria> listar();
+    @Autowired
+    private CategoriaRepository repository;
 
-    Categoria buscarPorId(Long id);
+    public List<Categoria> listar() {
+        return repository.findAll();
+    }
 
-    Categoria guardar(Categoria categoria);
+    public Categoria buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-    Categoria actualizar(Long id, Categoria categoria);
+    public Categoria guardar(Categoria categoria) {
+        return repository.save(categoria);
+    }
 
-    void eliminar(Long id);
+    public Categoria actualizar(Long id, Categoria categoria) {
+
+        Categoria existente = repository.findById(id).orElse(null);
+
+        if (existente != null) {
+
+            existente.setNombre(categoria.getNombre());
+            existente.setDescripcion(categoria.getDescripcion());
+
+            return repository.save(existente);
+        }
+
+        return null;
+    }
+
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
+
 }

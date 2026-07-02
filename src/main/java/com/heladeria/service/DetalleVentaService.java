@@ -1,17 +1,59 @@
 package com.heladeria.service;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.heladeria.model.DetalleVenta;
+import com.heladeria.repository.DetalleVentaRepository;
 
-public interface DetalleVentaService {
+@Service
+public class DetalleVentaService {
 
-    List<DetalleVenta> listar();
+    @Autowired
+    private DetalleVentaRepository repository;
 
-    DetalleVenta buscarPorId(Long id);
+    public List<DetalleVenta> listar() {
+        return repository.findAll();
+    }
 
-    DetalleVenta guardar(DetalleVenta detalleVenta);
+    public DetalleVenta buscarPorId(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-    DetalleVenta actualizar(Long id, DetalleVenta detalleVenta);
+    public DetalleVenta guardar(DetalleVenta detalle) {
 
-    void eliminar(Long id);
+        // El subtotal se calcula automáticamente
+        // gracias al @PrePersist de la entidad.
+
+        return repository.save(detalle);
+
+    }
+
+    public DetalleVenta actualizar(Long id, DetalleVenta detalle) {
+
+        DetalleVenta existente = repository.findById(id).orElse(null);
+
+        if (existente != null) {
+
+            existente.setCantidad(detalle.getCantidad());
+            existente.setPrecio(detalle.getPrecio());
+            existente.setProducto(detalle.getProducto());
+            existente.setVenta(detalle.getVenta());
+
+            return repository.save(existente);
+
+        }
+
+        return null;
+
+    }
+
+    public void eliminar(Long id) {
+
+        repository.deleteById(id);
+
+    }
+
 }

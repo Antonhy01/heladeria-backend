@@ -1,8 +1,11 @@
 package com.heladeria.model;
 
-import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "categoria")
@@ -12,15 +15,14 @@ public class Categoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false)
     private String nombre;
 
-    @Column(length = 255)
     private String descripcion;
 
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Producto> productos;
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+    private List<Producto> productos = new ArrayList<>();
 
     public Categoria() {
     }
@@ -63,4 +65,5 @@ public class Categoria {
     public void setProductos(List<Producto> productos) {
         this.productos = productos;
     }
+
 }

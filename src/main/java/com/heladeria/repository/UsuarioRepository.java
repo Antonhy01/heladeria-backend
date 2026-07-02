@@ -1,13 +1,11 @@
 package com.heladeria.repository;
 
-import com.heladeria.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.heladeria.model.Usuario;
 
-public interface UsuarioRepository
-        extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
-    Optional<Usuario> findByUsuario(String usuario);
+    Usuario findByUsername(String username);
 
 }
