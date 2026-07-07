@@ -1,12 +1,13 @@
 package com.heladeria.model;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "producto")
@@ -14,44 +15,58 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_producto")
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Size(max = 255)
+    @Column(length = 255)
     private String descripcion;
 
-    @Column(nullable = false)
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.01", message = "El precio debe ser mayor que cero")
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
+    @NotNull(message = "El stock es obligatorio")
+    @PositiveOrZero(message = "El stock no puede ser negativo")
     @Column(nullable = false)
     private Integer stock;
 
-    @ManyToOne
-    @JoinColumn(name = "categoria_id")
-    private Categoria categoria;
+    @NotBlank(message = "El sabor es obligatorio")
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
+    private String sabor;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "producto")
-    private List<DetalleVenta> detalles = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private Categoria categoria;
 
     public Producto() {
     }
 
-    public Producto(Long id, String nombre, String descripcion, BigDecimal precio,
-            Integer stock, Categoria categoria, List<DetalleVenta> detalles) {
-
+    public Producto(Long id, String nombre, String descripcion,
+                    BigDecimal precio, Integer stock,
+                    String sabor, Categoria categoria) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.stock = stock;
+        this.sabor = sabor;
         this.categoria = categoria;
-        this.detalles = detalles;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -60,10 +75,6 @@ public class Producto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getDescripcion() {
@@ -90,6 +101,14 @@ public class Producto {
         this.stock = stock;
     }
 
+    public String getSabor() {
+        return sabor;
+    }
+
+    public void setSabor(String sabor) {
+        this.sabor = sabor;
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
@@ -97,13 +116,4 @@ public class Producto {
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
-
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
-
 }

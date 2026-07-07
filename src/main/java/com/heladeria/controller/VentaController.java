@@ -3,42 +3,84 @@ package com.heladeria.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.heladeria.model.Venta;
 import com.heladeria.service.VentaService;
+
 
 @RestController
 @RequestMapping("/api/ventas")
 @CrossOrigin(origins = "*")
 public class VentaController {
 
+
     @Autowired
-    private VentaService service;
+    private VentaService ventaService;
 
+
+
+    // Listar todas las ventas
     @GetMapping
-    public List<Venta> listar() {
-        return service.listar();
+    public ResponseEntity<List<Venta>> listar() {
+
+        return ResponseEntity.ok(
+                ventaService.listar()
+        );
     }
 
+
+
+    // Buscar venta por ID
     @GetMapping("/{id}")
-    public Venta buscar(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    public ResponseEntity<Venta> buscarPorId(
+            @PathVariable Long id) {
+
+
+        return ventaService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+
+
+    // Registrar venta
     @PostMapping
-    public Venta guardar(@RequestBody Venta venta) {
-        return service.guardar(venta);
+    public ResponseEntity<Venta> guardar(
+            @RequestBody Venta venta) {
+
+
+        return ResponseEntity.ok(
+                ventaService.guardar(venta)
+        );
     }
 
+
+
+    // Actualizar venta
     @PutMapping("/{id}")
-    public Venta actualizar(@PathVariable Long id,
-                            @RequestBody Venta venta) {
-        return service.actualizar(id, venta);
+    public ResponseEntity<Venta> actualizar(
+            @PathVariable Long id,
+            @RequestBody Venta venta) {
+
+
+        return ResponseEntity.ok(
+                ventaService.actualizar(id, venta)
+        );
     }
 
+
+
+    // Eliminar venta
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    public ResponseEntity<Void> eliminar(
+            @PathVariable Long id) {
+
+
+        ventaService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
     }
+
 }

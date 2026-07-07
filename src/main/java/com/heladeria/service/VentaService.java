@@ -1,103 +1,71 @@
 package com.heladeria.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.heladeria.model.DetalleVenta;
-import com.heladeria.model.Producto;
 import com.heladeria.model.Venta;
-import com.heladeria.repository.ProductoRepository;
 import com.heladeria.repository.VentaRepository;
 
 @Service
 public class VentaService {
 
-    @Autowired
-    private VentaRepository repository;
 
     @Autowired
-    private ProductoRepository productoRepository;
+    private VentaRepository ventaRepository;
 
+
+    // Listar todas las ventas
     public List<Venta> listar() {
-        return repository.findAll();
+        return ventaRepository.findAll();
     }
 
-    public Venta buscarPorId(Long id) {
-        return repository.findById(id).orElse(null);
+
+    // Buscar venta por ID
+    public Optional<Venta> buscarPorId(Long id) {
+        return ventaRepository.findById(id);
     }
 
+
+    // Registrar venta
     public Venta guardar(Venta venta) {
-
-        venta.setFecha(LocalDateTime.now());
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        if (venta.getDetalles() != null) {
-
-            for (DetalleVenta detalle : venta.getDetalles()) {
-
-                Producto producto = productoRepository
-                        .findById(detalle.getProducto().getId())
-                        .orElseThrow();
-
-                if (producto.getStock() < detalle.getCantidad()) {
-
-                    throw new RuntimeException(
-                            "Stock insuficiente para el producto: "
-                                    + producto.getNombre());
-
-                }
-
-                detalle.setVenta(venta);
-
-                detalle.setPrecio(producto.getPrecio());
-
-                BigDecimal subtotal = producto.getPrecio()
-                        .multiply(BigDecimal.valueOf(detalle.getCantidad()));
-
-                detalle.setSubtotal(subtotal);
-
-                total = total.add(subtotal);
-
-                producto.setStock(
-                        producto.getStock() - detalle.getCantidad());
-
-                productoRepository.save(producto);
-
-            }
-
-        }
-
-        venta.setTotal(total);
-
-        return repository.save(venta);
-
+        return ventaRepository.save(venta);
     }
 
-    public Venta actualizar(Long id, Venta venta) {
 
-        Venta existente = repository.findById(id).orElse(null);
+    // Actualizar venta
+    public Venta actualizar(Long id, Venta ventaActualizada) {
 
-        if (existente != null) {
+        return ventaRepository.findById(id)
+                .map(venta -> {
 
-            existente.setCliente(venta.getCliente());
+                    venta.setFecha(ventaActualizada.getFecha());
+                    venta.setTotal(ventaActualizada.getTotal());
+                    venta.setCliente(ventaActualizada.getCliente());
 
-            return repository.save(existente);
+                    return ventaRepository.save(venta);
 
-        }
-
-        return null;
-
+                })
+                .orElseThrow(() ->
+                    new RuntimeException(
+                        "Venta no encontrada con ID: " + id
+                    )
+                );
     }
 
+
+    // Eliminar venta
     public void eliminar(Long id) {
 
-        repository.deleteById(id);
+        if (!ventaRepository.existsById(id)) {
 
+            throw new RuntimeException(
+                "Venta no encontrada con ID: " + id
+            );
+        }
+
+        ventaRepository.deleteById(id);
     }
-
 }

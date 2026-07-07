@@ -1,32 +1,49 @@
 package com.heladeria.dto;
 
+
+
 public class LoginRequest {
 
-    private String usuario;
+
+
+    private String username;
+
+
     private String password;
 
-    public LoginRequest() {
+
+
+
+    public String getUsername(){
+
+        return username;
+
     }
 
-    public LoginRequest(String usuario, String password) {
-        this.usuario = usuario;
-        this.password = password;
+
+
+    public void setUsername(String username){
+
+        this.username=username;
+
     }
 
-    public String getUsuario() {
-        return usuario;
-    }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
 
-    public String getPassword() {
+
+    public String getPassword(){
+
         return password;
+
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+
+
+    public void setPassword(String password){
+
+        this.password=password;
+
     }
+
 
 }

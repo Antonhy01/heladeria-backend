@@ -1,6 +1,7 @@
 package com.heladeria.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,44 +13,60 @@ import com.heladeria.repository.ProductoRepository;
 public class ProductoService {
 
     @Autowired
-    private ProductoRepository repository;
+    private ProductoRepository productoRepository;
 
+
+    // Listar todos los productos
     public List<Producto> listar() {
-        return repository.findAll();
+        return productoRepository.findAll();
     }
 
-    public Producto buscarPorId(Long id) {
-        return repository.findById(id).orElse(null);
+
+    // Buscar producto por ID
+    public Optional<Producto> buscarPorId(Long id) {
+        return productoRepository.findById(id);
     }
 
-    public List<Producto> buscarPorNombre(String nombre) {
-        return repository.findByNombreContainingIgnoreCase(nombre);
-    }
 
+    // Guardar producto
     public Producto guardar(Producto producto) {
-        return repository.save(producto);
+        return productoRepository.save(producto);
     }
 
-    public Producto actualizar(Long id, Producto producto) {
 
-        Producto existente = repository.findById(id).orElse(null);
+    // Actualizar producto
+    public Producto actualizar(Long id, Producto productoActualizado) {
 
-        if (existente != null) {
+        return productoRepository.findById(id)
+                .map(producto -> {
 
-            existente.setNombre(producto.getNombre());
-            existente.setDescripcion(producto.getDescripcion());
-            existente.setPrecio(producto.getPrecio());
-            existente.setStock(producto.getStock());
-            existente.setCategoria(producto.getCategoria());
+                    producto.setNombre(productoActualizado.getNombre());
+                    producto.setSabor(productoActualizado.getSabor());
+                    producto.setPrecio(productoActualizado.getPrecio());
+                    producto.setStock(productoActualizado.getStock());
+                    producto.setCategoria(productoActualizado.getCategoria());
 
-            return repository.save(existente);
+                    return productoRepository.save(producto);
+
+                })
+                .orElseThrow(() -> 
+                    new RuntimeException(
+                        "Producto no encontrado con ID: " + id
+                    )
+                );
+    }
+
+
+    // Eliminar producto
+    public void eliminar(Long id) {
+
+        if (!productoRepository.existsById(id)) {
+
+            throw new RuntimeException(
+                "Producto no encontrado con ID: " + id
+            );
         }
 
-        return null;
+        productoRepository.deleteById(id);
     }
-
-    public void eliminar(Long id) {
-        repository.deleteById(id);
-    }
-
 }

@@ -1,11 +1,10 @@
 package com.heladeria.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "cliente")
@@ -13,39 +12,47 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cliente")
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Los nombres son obligatorios")
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String nombres;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Los apellidos son obligatorios")
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String apellidos;
 
-    @Column(nullable = false, unique = true)
+    @Pattern(regexp = "\\d{8}", message = "El DNI debe tener 8 dígitos")
+    @Column(nullable = false, unique = true, length = 8)
     private String dni;
 
+    @Pattern(regexp = "\\d{9}", message = "El teléfono debe tener 9 dígitos")
+    @Column(length = 9)
     private String telefono;
 
-    private String direccion;
+    @Email(message = "Correo electrónico inválido")
+    @Column(unique = true, length = 100)
+    private String email;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Venta> ventas = new ArrayList<>();
+    @Size(max = 200)
+    @Column(length = 200)
+    private String direccion;
 
     public Cliente() {
     }
 
-    public Cliente(Long id, String nombres, String apellidos,
-                   String dni, String telefono, String direccion,
-                   List<Venta> ventas) {
-
+    public Cliente(Long id, String nombres, String apellidos, String dni,
+                   String telefono, String email, String direccion) {
         this.id = id;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.dni = dni;
         this.telefono = telefono;
+        this.email = email;
         this.direccion = direccion;
-        this.ventas = ventas;
     }
 
     public Long getId() {
@@ -88,6 +95,14 @@ public class Cliente {
         this.telefono = telefono;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getDireccion() {
         return direccion;
     }
@@ -95,13 +110,4 @@ public class Cliente {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-
-    public List<Venta> getVentas() {
-        return ventas;
-    }
-
-    public void setVentas(List<Venta> ventas) {
-        this.ventas = ventas;
-    }
-
 }

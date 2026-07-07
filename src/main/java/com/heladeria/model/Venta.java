@@ -2,12 +2,10 @@ package com.heladeria.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "venta")
@@ -15,37 +13,34 @@ public class Venta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_venta")
     private Long id;
 
+    @Column(nullable = false)
     private LocalDateTime fecha;
 
+    @NotNull(message = "El total es obligatorio")
+    @DecimalMin(value = "0.00", message = "El total no puede ser negativo")
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "venta",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
-    private List<DetalleVenta> detalles = new ArrayList<>();
-
     public Venta() {
-        this.fecha = LocalDateTime.now();
-        this.total = BigDecimal.ZERO;
     }
 
-    public Venta(Long id, LocalDateTime fecha,
-                 BigDecimal total,
-                 Cliente cliente,
-                 List<DetalleVenta> detalles) {
+    @PrePersist
+    public void prePersist() {
+        this.fecha = LocalDateTime.now();
+    }
 
+    public Venta(Long id, LocalDateTime fecha, BigDecimal total, Cliente cliente) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
         this.cliente = cliente;
-        this.detalles = detalles;
     }
 
     public Long getId() {
@@ -53,7 +48,7 @@ public class Venta {
     }
 
     public void setId(Long id) {
-        this.id=id;
+        this.id = id;
     }
 
     public LocalDateTime getFecha() {
@@ -61,7 +56,7 @@ public class Venta {
     }
 
     public void setFecha(LocalDateTime fecha) {
-        this.fecha=fecha;
+        this.fecha = fecha;
     }
 
     public BigDecimal getTotal() {
@@ -69,7 +64,7 @@ public class Venta {
     }
 
     public void setTotal(BigDecimal total) {
-        this.total=total;
+        this.total = total;
     }
 
     public Cliente getCliente() {
@@ -77,15 +72,7 @@ public class Venta {
     }
 
     public void setCliente(Cliente cliente) {
-        this.cliente=cliente;
-    }
-
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles=detalles;
+        this.cliente = cliente;
     }
 
 }

@@ -1,48 +1,89 @@
 package com.heladeria.controller;
 
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import com.heladeria.model.Usuario;
 import com.heladeria.service.UsuarioService;
+
+
 
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
+
     @Autowired
-    private UsuarioService service;
+    private UsuarioService usuarioService;
 
+
+
+    // Listar usuarios
     @GetMapping
-    public List<Usuario> listar() {
-        return service.listar();
+    public ResponseEntity<List<Usuario>> listar(){
+
+        return ResponseEntity.ok(
+            usuarioService.listar()
+        );
     }
 
+
+
+    // Buscar usuario
     @GetMapping("/{id}")
-    public Usuario buscar(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    public ResponseEntity<Usuario> buscar(
+            @PathVariable Long id){
+
+        return usuarioService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(
+                    ResponseEntity.notFound().build()
+                );
     }
 
+
+
+    // Crear usuario
     @PostMapping
-    public Usuario guardar(@RequestBody Usuario usuario) {
-        return service.guardar(usuario);
+    public ResponseEntity<Usuario> guardar(
+            @RequestBody Usuario usuario){
+
+        return ResponseEntity.ok(
+            usuarioService.guardar(usuario)
+        );
     }
 
+
+
+    // Actualizar usuario
     @PutMapping("/{id}")
-    public Usuario actualizar(@PathVariable Long id,
-                              @RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> actualizar(
+            @PathVariable Long id,
+            @RequestBody Usuario usuario){
 
-        return service.actualizar(id, usuario);
+
+        return ResponseEntity.ok(
+            usuarioService.actualizar(id, usuario)
+        );
     }
 
+
+
+    // Eliminar usuario
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(
+            @PathVariable Long id){
 
-        service.eliminar(id);
 
+        usuarioService.eliminar(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

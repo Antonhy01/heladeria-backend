@@ -1,11 +1,8 @@
 package com.heladeria.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "categoria")
@@ -13,25 +10,25 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_categoria")
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre de la categoría es obligatorio")
+    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
+    @Column(nullable = false, unique = true, length = 100)
     private String nombre;
 
+    @Size(max = 255)
+    @Column(length = 255)
     private String descripcion;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
-    private List<Producto> productos = new ArrayList<>();
 
     public Categoria() {
     }
 
-    public Categoria(Long id, String nombre, String descripcion, List<Producto> productos) {
+    public Categoria(Long id, String nombre, String descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.productos = productos;
     }
 
     public Long getId() {
@@ -57,13 +54,4 @@ public class Categoria {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
-    public List<Producto> getProductos() {
-        return productos;
-    }
-
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
-    }
-
 }

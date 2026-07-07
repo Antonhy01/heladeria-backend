@@ -1,6 +1,7 @@
 package com.heladeria.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,37 +13,54 @@ import com.heladeria.repository.CategoriaRepository;
 public class CategoriaService {
 
     @Autowired
-    private CategoriaRepository repository;
+    private CategoriaRepository categoriaRepository;
 
+
+    // Listar todas las categorias
     public List<Categoria> listar() {
-        return repository.findAll();
+        return categoriaRepository.findAll();
     }
 
-    public Categoria buscarPorId(Long id) {
-        return repository.findById(id).orElse(null);
+
+    // Buscar categoria por ID
+    public Optional<Categoria> buscarPorId(Long id) {
+        return categoriaRepository.findById(id);
     }
 
+
+    // Guardar categoria
     public Categoria guardar(Categoria categoria) {
-        return repository.save(categoria);
+        return categoriaRepository.save(categoria);
     }
 
-    public Categoria actualizar(Long id, Categoria categoria) {
 
-        Categoria existente = repository.findById(id).orElse(null);
+    // Actualizar categoria
+    public Categoria actualizar(Long id, Categoria categoriaActualizada) {
 
-        if (existente != null) {
+        return categoriaRepository.findById(id)
+                .map(categoria -> {
 
-            existente.setNombre(categoria.getNombre());
-            existente.setDescripcion(categoria.getDescripcion());
+                    categoria.setNombre(categoriaActualizada.getNombre());
+                    categoria.setDescripcion(categoriaActualizada.getDescripcion());
 
-            return repository.save(existente);
+                    return categoriaRepository.save(categoria);
+
+                })
+                .orElseThrow(() -> 
+                    new RuntimeException("Categoria no encontrada con ID: " + id)
+                );
+    }
+
+
+    // Eliminar categoria
+    public void eliminar(Long id) {
+
+        if (!categoriaRepository.existsById(id)) {
+            throw new RuntimeException(
+                "Categoria no encontrada con ID: " + id
+            );
         }
 
-        return null;
+        categoriaRepository.deleteById(id);
     }
-
-    public void eliminar(Long id) {
-        repository.deleteById(id);
-    }
-
 }
