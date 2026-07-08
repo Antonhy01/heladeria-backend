@@ -1,50 +1,31 @@
 package com.heladeria.controller;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.heladeria.model.Usuario;
-import com.heladeria.service.AuthService;
+import com.heladeria.dto.LoginRequest;
+import com.heladeria.dto.LoginResponse;
+import com.heladeria.security.JwtService;
 
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin("*")
 public class AuthController {
 
-
     @Autowired
-    private AuthService authService;
-
-
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @RequestBody Usuario usuario
-    ){
-
-        return ResponseEntity.ok(
-            authService.register(usuario)
-        );
-
-    }
-
-
+    private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody Usuario usuario
-    ){
+    public LoginResponse login(@RequestBody LoginRequest request) {
 
-        return ResponseEntity.ok(
-            authService.login(
-                usuario.getUsername(),
-                usuario.getPassword()
-            )
-        );
+        // Usuario de prueba
+        if ("admin".equals(request.getUsername())
+                && "123456".equals(request.getPassword())) {
 
+            String token = jwtService.generateToken(request.getUsername());
+
+            return new LoginResponse(token);
+        }
+
+        throw new RuntimeException("Usuario o contraseña incorrectos");
     }
-
 }

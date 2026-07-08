@@ -1,180 +1,85 @@
 package com.heladeria.security;
 
-
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
 
 import javax.crypto.SecretKey;
 
-
 import org.springframework.stereotype.Service;
 
-
-import com.heladeria.model.Usuario;
-
-
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
-
 
 @Service
 public class JwtService {
 
-
-
     private static final String SECRET_KEY =
+            "heladeriaSistemaJWTJava17SpringBoot2026Segura123";
 
-            "heladeria-sistema-seguro-token-jwt-java17-2026-clave-muy-larga";
+    private static final long EXPIRATION = 1000 * 60 * 60 * 24;
 
-
-
-
-
-    private SecretKey getKey(){
-
-
+    private SecretKey getKey() {
         return Keys.hmacShaKeyFor(
-                SECRET_KEY.getBytes()
+                SECRET_KEY.getBytes(StandardCharsets.UTF_8)
         );
-
-
     }
 
-
-
-
-
-
-
-    public String generateToken(
-            Usuario usuario
-    ){
-
-
+    public String generateToken(String username) {
 
         return Jwts.builder()
 
+                .setSubject(username)
 
-                .subject(
-                    usuario.getUsername()
+                .setIssuedAt(new Date())
+
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + EXPIRATION)
                 )
 
-
-                .claim(
-                    "rol",
-                    usuario.getRol()
-                )
-
-
-                .issuedAt(
-                    new Date()
-                )
-
-
-                .expiration(
-
-                    new Date(
-
-                    System.currentTimeMillis()
-                    +
-                    86400000
-
-                    )
-
-                )
-
-
-                .signWith(
-                    getKey()
-                )
-
+                .signWith(getKey(), SignatureAlgorithm.HS256)
 
                 .compact();
 
-
-
     }
 
+    public String extractUsername(String token) {
 
+        Claims claims = Jwts.parserBuilder()
 
-
-
-
-
-    public String extractUsername(
-            String token
-    ){
-
-
-        return Jwts.parser()
-
-
-                .verifyWith(
-                    getKey()
-                )
-
+                .setSigningKey(getKey())
 
                 .build()
 
+                .parseClaimsJws(token)
 
-                .parseSignedClaims(
-                    token
-                )
+                .getBody();
 
-
-                .getPayload()
-
-
-                .getSubject();
-
+        return claims.getSubject();
 
     }
 
+    public boolean validateToken(String token) {
 
+        try {
 
+            Jwts.parserBuilder()
 
+                    .setSigningKey(getKey())
 
+                    .build()
 
-
-
-    public boolean validateToken(
-            String token
-    ){
-
-
-        try{
-
-
-            Jwts.parser()
-
-            .verifyWith(
-                getKey()
-            )
-
-            .build()
-
-            .parseSignedClaims(
-                token
-            );
-
-
+                    .parseClaimsJws(token);
 
             return true;
 
-
-
-        }catch(Exception e){
-
+        } catch (Exception e) {
 
             return false;
 
-
         }
 
-
     }
-
 
 }
